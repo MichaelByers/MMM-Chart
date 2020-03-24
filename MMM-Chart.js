@@ -63,7 +63,7 @@ Module.register("MMM-Chart", {
             var dataY = [];
             var dataH = [];
 
-			today = moment(this.covidData[0].dateChecked).format('MMMM Do YYYY');
+			today = moment(this.covidData[0].dateChecked).format('MMMM Do');
             count = this.covidData[0].positive;
 			text = title + today + ' : ' + count;
 
