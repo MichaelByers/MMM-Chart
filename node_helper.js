@@ -27,26 +27,23 @@ module.exports = NodeHelper.create({
             // Check to see if we are error free and got an OK response
             if (!error && response.statusCode == 200) { 
                 _this.currData = result;
+                request({url: _this.url[1], method: 'GET'}, function(error, response, body) {
+                    // Lets convert the body into JSON
+                    var result = JSON.parse(body);
+        
+                    // Check to see if we are error free and got an OK response
+                    if (!error && response.statusCode == 200) { 
+                        _this.covidData = result;
+                        // We have the response figured out so lets fire off the notifiction
+                        _this.sendSocketNotification('GOT-COVID', {'url': _this.url, 'currData': _this.currData, 'covidData': _this.covidData});
+                    } else {
+                        // In all other cases it's some other error
+                    }
+                }); 
             } else {
                 // In all other cases it's some other error
             }
         });
-
-        request({url: this.url[1], method: 'GET'}, function(error, response, body) {
-            // Lets convert the body into JSON
-            var result = JSON.parse(body);
-
-            // Check to see if we are error free and got an OK response
-            if (!error && response.statusCode == 200) { 
-                _this.covidData = result;
-            } else {
-                // In all other cases it's some other error
-            }
-        });
-
-        // We have the response figured out so lets fire off the notifiction
-        this.sendSocketNotification('GOT-COVID', {'url': this.url, 'currData': this.currData, 'covidData': this.covidData});
- 
     },
 
     socketNotificationReceived: function(notification, payload) {
