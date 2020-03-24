@@ -11,34 +11,122 @@ Module.register("MMM-Chart", {
     defaults: {
         width       : 200,
         height      : 200,
+        interval:   120000,
         chartConfig : {}
     },
 
     getScripts: function() {
-		return ["modules/" + this.name + "/node_modules/chart.js/dist/Chart.bundle.min.js"];
+		return ["moment.js", "modules/" + this.name + "/node_modules/chart.js/dist/Chart.bundle.min.js"];
 	},
 
+    getStyles: function() {
+        return ['chart.css', 'font-awesome.css'];
+    },
+
 	start: function() {
+        Log.log('Starting module: ' + this.name);
+        var self = this;
+
+        // Set up the local values, here we construct the request url to use
+        this.loaded = false;
+        this.data = [];
+        this.url = 'https://covidtracking.com/api/states/daily?state=CO';
         this.config = Object.assign({}, this.defaults, this.config);
-		Log.info("Starting module: " + this.name);
-	},
+
+        this.getCovidData(this);
+        setInterval(function() {
+            self.getCovidData(self);
+          }, self.config.interval);
+
+    },
+
+    getCovidData: function(_this) {
+		// get latest data
+        _this.sendSocketNotification('GET-COVID', _this.url);
+    },
 
 	getDom: function() {
         // Create wrapper element
-        const wrapperEl = document.createElement("div");
-        wrapperEl.setAttribute("style", "position: relative; display: inline-block;");
+        var wrapper = document.createElement('div');
 
-        // Create chart canvas
-        const chartEl  = document.createElement("canvas");
-        chartEl.width  = this.config.width;
-        chartEl.height = this.config.height;
+        if (this.loaded) {
+	 	    wrapper.className = 'data';
+//             wrapperEl.setAttribute("style", "position: relative; display: inline-block;");
+            // create today's data row
+            dataRow = document.createElement('div');
+			var title = 'As of ';
+			var today = '';
+			var text = '';
+            var count = '';
+            var dataX = null;
+            var dataY = null;
+            var dataH = null;
 
-        // Init chart.js
-        this.chart = new Chart(chartEl.getContext("2d"), this.config.chartConfig);
+			today = moment(this.data[0].dateChecked).format('MMMM Do YYYY');
+            count = this.data[0].positive;
+			text = title + today + ' : ' + count;
 
-        // Append chart
-        wrapperEl.appendChild(chartEl);
+            dataRow.innerHTML = text;
+            wrapper.appendChild(dataRow);
 
-		return wrapperEl;
-	}
+            // Create chart canvas
+            var chartEl = document.createElement("canvas");
+            chartEl.width  = this.config.width;
+            chartEl.height = this.config.height;
+            // format data
+            this.data.forEach(function(item){
+                dataX.push(moment(item.dateChecked).format('MM-DD'));
+                dataY.push(item.positive);
+                dataH.push(item.hospitalized);
+            });
+
+            this.config.chartConfig = {
+                type: 'line',
+                data: {
+                  labels: dataX,
+                  datasets: [{ 
+                      data: dataY,
+                      label: "Positive",
+                      borderColor: "#3e95cd",
+                      fill: false
+                    }, { 
+                      data: dataH,
+                      label: "Hospitalized",
+                      borderColor: "#8e5ea2",
+                      fill: false
+                    }
+                  ]
+                },
+                options: {
+                  title: {
+                    display: true,
+                    text: 'Colorado Cases'
+                  }
+                }
+            };
+
+            // Init chart.js
+            this.chart = new Chart(chartEl.getContext("2d"), this.config.chartConfig);
+
+            // Append chart
+            wrapper.appendChild(chartEl);
+
+        } else {
+            // Otherwise lets just use a simple div
+            wrapper.innerHTML = 'LOADING...';
+        }
+
+		return wrapper;
+    },
+    
+    socketNotificationReceived: function(notification, payload) {
+        // check to see if the response was for us and used the same url
+        if (notification === 'GOT-COVID' && payload.url === this.url) {
+                // we got some data so set the flag, stash the data to display then request the dom update
+                this.loaded = true;
+                this.data = payload.data;
+                this.updateDom(1000);
+        }
+    }
+
 });
