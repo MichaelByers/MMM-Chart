@@ -80,7 +80,12 @@ Module.register("MMM-Chart", {
                 dataY.push(item.positive);
                 dataH.push(item.hospitalized);
             });
-
+            // reverse array, currently newest is first
+            dataX.reverse();
+            dataY.reverse();
+            dataH.reverse();
+            
+            // build chart
             this.config.chartConfig = {
                 type: 'line',
                 data: {
