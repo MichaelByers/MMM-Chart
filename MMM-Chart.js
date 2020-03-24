@@ -30,7 +30,7 @@ Module.register("MMM-Chart", {
 
         // Set up the local values, here we construct the request url to use
         this.loaded = false;
-        this.data = [];
+        this.covidData = [];
         this.url = 'https://covidtracking.com/api/states/daily?state=CO';
         this.config = Object.assign({}, this.defaults, this.config);
 
@@ -51,20 +51,20 @@ Module.register("MMM-Chart", {
         var wrapper = document.createElement('div');
 
         if (this.loaded) {
-	 	    wrapper.className = 'data';
-//             wrapperEl.setAttribute("style", "position: relative; display: inline-block;");
+//	 	    wrapper.className = 'data';
+            wrapper.setAttribute("style", "position: relative; display: inline-block;");
             // create today's data row
             dataRow = document.createElement('div');
 			var title = 'As of ';
 			var today = '';
 			var text = '';
             var count = '';
-            var dataX = null;
-            var dataY = null;
-            var dataH = null;
+            var dataX = [];
+            var dataY = [];
+            var dataH = [];
 
-			today = moment(this.data[0].dateChecked).format('MMMM Do YYYY');
-            count = this.data[0].positive;
+			today = moment(this.covidData[0].dateChecked).format('MMMM Do YYYY');
+            count = this.covidData[0].positive;
 			text = title + today + ' : ' + count;
 
             dataRow.innerHTML = text;
@@ -75,7 +75,7 @@ Module.register("MMM-Chart", {
             chartEl.width  = this.config.width;
             chartEl.height = this.config.height;
             // format data
-            this.data.forEach(function(item){
+            this.covidData.forEach(function(item){
                 dataX.push(moment(item.dateChecked).format('MM-DD'));
                 dataY.push(item.positive);
                 dataH.push(item.hospitalized);
@@ -125,7 +125,7 @@ Module.register("MMM-Chart", {
         if (notification === 'GOT-COVID' && payload.url === this.url) {
                 // we got some data so set the flag, stash the data to display then request the dom update
                 this.loaded = true;
-                this.data = payload.data;
+                this.covidData = payload.covidData;
                 this.updateDom(1000);
         }
     }

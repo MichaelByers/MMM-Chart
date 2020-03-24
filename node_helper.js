@@ -21,17 +21,17 @@ module.exports = NodeHelper.create({
         request({url: this.url, method: 'GET'}, function(error, response, body) {
             // Lets convert the body into JSON
             var result = JSON.parse(body);
-            var data = null; // Clear the array
+            var covidData = null; // Clear the array
 
             // Check to see if we are error free and got an OK response
             if (!error && response.statusCode == 200) { 
-                data = result;
+                covidData = result;
             } else {
                 // In all other cases it's some other error
             }
 
             // We have the response figured out so lets fire off the notifiction
-            _this.sendSocketNotification('GOT-COVID', {'url': _this.url, 'data': data});
+            _this.sendSocketNotification('GOT-COVID', {'url': _this.url, 'covidData': covidData});
         });
     },
 
