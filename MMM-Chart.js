@@ -16,7 +16,8 @@ Module.register("MMM-Chart", {
     },
 
     getScripts: function() {
-		return ["moment.js", "modules/" + this.name + "/node_modules/chart.js/dist/Chart.bundle.min.js"];
+		return ["moment.js", "Chart.bundle.min.js"];
+//		return ["moment.js", "modules/" + this.name + "/node_modules/chart.js/dist/Chart.bundle.min.js"];
 	},
 
     getStyles: function() {
