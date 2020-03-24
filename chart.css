@@ -10,6 +10,7 @@ span.quote
   display: flex;
   text-align: center;
   padding-bottom: 5px;
+  max-width: 200px;
   font-size: 30px;
 }
 .forecastText {

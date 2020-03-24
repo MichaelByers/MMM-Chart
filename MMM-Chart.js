@@ -17,7 +17,6 @@ Module.register("MMM-Chart", {
 
     getScripts: function() {
 		return ["moment.js", "Chart.bundle.min.js"];
-//		return ["moment.js", "modules/" + this.name + "/node_modules/chart.js/dist/Chart.bundle.min.js"];
 	},
 
     getStyles: function() {
@@ -31,7 +30,8 @@ Module.register("MMM-Chart", {
         // Set up the local values, here we construct the request url to use
         this.loaded = false;
         this.covidData = [];
-        this.url = 'https://covidtracking.com/api/states/daily?state=CO';
+        this.currData = null;
+        this.url = ['https://covidtracking.com/api/states?state=CO', 'https://covidtracking.com/api/states/daily?state=CO'];
         this.config = Object.assign({}, this.defaults, this.config);
 
         this.getCovidData(this);
@@ -63,8 +63,8 @@ Module.register("MMM-Chart", {
             var dataY = [];
             var dataH = [];
 
-			today = moment(this.covidData[0].dateChecked).format('MMMM Do');
-            count = this.covidData[0].positive;
+			today = moment(this.currData.dateChecked).format('MMMM Do');
+            count = this.currData.positive;
 			text = title + today + ' : ' + count;
 
             dataRow.innerHTML = text;
@@ -127,10 +127,11 @@ Module.register("MMM-Chart", {
     
     socketNotificationReceived: function(notification, payload) {
         // check to see if the response was for us and used the same url
-        if (notification === 'GOT-COVID' && payload.url === this.url) {
+        if (notification === 'GOT-COVID') {  //&& payload.url === this.url) {
                 // we got some data so set the flag, stash the data to display then request the dom update
                 this.loaded = true;
                 this.covidData = payload.covidData;
+                this.currData = payload.currData;
                 this.updateDom(1000);
         }
     }
