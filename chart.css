@@ -1,0 +1,19 @@
+span.quote
+{
+	margin: 0;
+	font-weight: bold;
+	color: #fff;
+	padding: 0 5px 0 10px;
+}
+
+.data {
+  display: flex;
+  text-align: center;
+  padding-bottom: 5px;
+  font-size: 30px;
+}
+.forecastText {
+  font-size: 17px;
+  max-width: 130px;
+  height: 50px;
+}
