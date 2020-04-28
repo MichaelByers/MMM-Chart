@@ -16,7 +16,7 @@ Module.register("MMM-Chart", {
     },
 
     getScripts: function() {
-		return ["moment.js", "Chart.bundle.min.js"];
+		return ["moment.js", "convert-csv-to-json.js", "Chart.bundle.min.js"];
 	},
 
     getStyles: function() {
@@ -35,6 +35,10 @@ Module.register("MMM-Chart", {
         this.config = Object.assign({}, this.defaults, this.config);
 
         this.getCovidData(this);
+        //test
+        debugger;
+        this.myData = csvToJson.formatValueByType().fieldDelimiter(',').getJsonFromCsv('https://drive.google.com/drive/folders/1bBAC7H-pdEDgPxRuU_eR36ghzc0HWNf1/cofid19_case_summary_2020-04-27.csv');
+
         setInterval(function() {
             self.getCovidData(self);
           }, self.config.interval);
