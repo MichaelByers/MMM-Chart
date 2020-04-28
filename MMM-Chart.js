@@ -16,7 +16,7 @@ Module.register("MMM-Chart", {
     },
 
     getScripts: function() {
-		return ["moment.js", "convert-csv-to-json.js", "Chart.bundle.min.js"];
+		return ["moment.js", "Chart.bundle.min.js"];
 	},
 
     getStyles: function() {
@@ -31,13 +31,11 @@ Module.register("MMM-Chart", {
         this.loaded = false;
         this.covidData = [];
         this.currData = null;
+        this.coData = null;
         this.url = ['https://covidtracking.com/api/states?state=CO', 'https://covidtracking.com/api/states/daily?state=CO'];
         this.config = Object.assign({}, this.defaults, this.config);
 
         this.getCovidData(this);
-        //test
-        debugger;
-        this.myData = csvToJson.formatValueByType().fieldDelimiter(',').getJsonFromCsv('https://drive.google.com/drive/folders/1bBAC7H-pdEDgPxRuU_eR36ghzc0HWNf1/cofid19_case_summary_2020-04-27.csv');
 
         setInterval(function() {
             self.getCovidData(self);
@@ -73,7 +71,7 @@ Module.register("MMM-Chart", {
 
             dataRow.innerHTML = text;
             wrapper.appendChild(dataRow);
-
+debugger;
             // Create chart canvas
             var chartEl = document.createElement("canvas");
             chartEl.width  = this.config.width;
@@ -136,6 +134,7 @@ Module.register("MMM-Chart", {
                 this.loaded = true;
                 this.covidData = payload.covidData;
                 this.currData = payload.currData;
+                this.coData = payload.coData;
                 this.updateDom(1000);
         }
     }
